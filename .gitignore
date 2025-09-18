@@ -1,0 +1,19 @@
+# Java
+target/
+
+# Logs
+*.log
+
+# Environment & Secrets
+.env
+*.env
+src/main/resources/application-dev.properties
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
