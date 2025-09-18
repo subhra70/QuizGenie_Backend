@@ -1,9 +1,7 @@
 package com.subhrashaw.QuizGeneratorBackend.Config;
 
-import com.subhrashaw.QuizGeneratorBackend.Config.JwtFilter;
-import com.subhrashaw.QuizGeneratorBackend.Config.CustomOAuth2SuccessHandler;
 import com.subhrashaw.QuizGeneratorBackend.DAO.UserRepo;
-import com.subhrashaw.QuizGeneratorBackend.Model.User;
+import com.subhrashaw.QuizGeneratorBackend.Model.QuizUsers;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +84,7 @@ public class SecurityConfig {
 
             // Save user if not already in DB (no password needed)
             if (email != null && userRepo.findByEmail(email) == null) {
-                User newUser = new User();
+                QuizUsers newUser = new QuizUsers();
                 newUser.setEmail(email);
                 newUser.setName(name);
                 newUser.setPicture(picture);

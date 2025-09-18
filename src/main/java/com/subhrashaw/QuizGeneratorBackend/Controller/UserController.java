@@ -1,6 +1,6 @@
 package com.subhrashaw.QuizGeneratorBackend.Controller;
 
-import com.subhrashaw.QuizGeneratorBackend.Model.User;
+import com.subhrashaw.QuizGeneratorBackend.Model.QuizUsers;
 import com.subhrashaw.QuizGeneratorBackend.Service.JwtService;
 import com.subhrashaw.QuizGeneratorBackend.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class UserController {
         }
         String token=header.substring(7);
         String email= jwtService.extractUserName(token);
-        User user=userService.getUser(email);
+        QuizUsers user=userService.getUser(email);
         if(user==null)
         {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

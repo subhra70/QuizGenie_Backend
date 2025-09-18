@@ -1,6 +1,6 @@
 package com.subhrashaw.QuizGeneratorBackend.Config;
 
-import com.subhrashaw.QuizGeneratorBackend.Model.User;
+import com.subhrashaw.QuizGeneratorBackend.Model.QuizUsers;
 import com.subhrashaw.QuizGeneratorBackend.Service.JwtService;
 import com.subhrashaw.QuizGeneratorBackend.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String email = user.getAttribute("email");
         System.out.println("Invoked handler");
         String jwt = jwtService.generateToken(email);
-        User user1=userService.getUser(email);
+        QuizUsers user1=userService.getUser(email);
         System.out.println(user1.getPicture());
         String image= URLEncoder.encode(user1.getPicture(), StandardCharsets.UTF_8.toString());
         String redirectUrl = frontendURL+"/login?token=" + jwt+"&image="+image;
