@@ -37,7 +37,6 @@ public class QuizController {
         if (!jwtService.validateToken(token, email)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        quizService.setMarks();
         List<QuizQuestion> list = generationService.generate(request);
         if (list == null || list.size() == 0) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
