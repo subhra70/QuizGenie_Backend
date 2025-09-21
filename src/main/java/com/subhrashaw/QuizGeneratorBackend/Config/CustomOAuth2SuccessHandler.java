@@ -33,7 +33,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         System.out.println("Invoked handler");
         String jwt = jwtService.generateToken(email);
         QuizUsers user1=userService.getUser(email);
-        System.out.println(user1.getPicture());
         String image= URLEncoder.encode(user1.getPicture(), StandardCharsets.UTF_8.toString());
         String redirectUrl = frontendURL+"/?token=" + jwt+"&image="+image;
         System.out.println("Done");
