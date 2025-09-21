@@ -85,7 +85,7 @@ public class GenerationService {
         return switch (request.getFormat()) {
             case "GATE" -> String.format(
                     "Generate a question set for the %s exam. Total questions: %d. The set should include " +
-                            "MCQs (1 & 2 marks, single answer), MSQs (1 & 2 marks, multiple answers), and NATs (1 & 2 marks, no options). " +
+                            "MCQs (1 & 2 marks, single answer), MSQs (1 & 2 marks, multiple answers), and NATs (1 & 2 marks, no options). For code snippet try to follow proper indentation" +
                             "Return the data in a JSON-friendly key-value format. Keys must be 'Question', 'Options' (comma-separated), " +
                             "'Answers' (comma-separated for MSQ), 'Type', and 'Marks'. " +
                             "Additional details: %s",
@@ -94,7 +94,7 @@ public class GenerationService {
             case "NIMCET" -> String.format(
                     "Generate a question set for the %s exam. Total questions: %d. " +
                             "Mathematics (50 questions, 12 marks each), Analytical Ability & Logical Reasoning (40 questions, 6 marks each), " +
-                            "Computer Awareness (20 questions, 6 marks each), and General English (10 questions, 4 marks each). " +
+                            "Computer Awareness (20 questions, 6 marks each), and General English (10 questions, 4 marks each). For code snippet try to follow proper indentation" +
                             "All questions are single-answer MCQs. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), " +
                             "'Answers', 'Type' (MCQ), and 'Marks'. " +
                             "Additional details: %s",
@@ -102,7 +102,7 @@ public class GenerationService {
 
             case "JECA" -> String.format(
                     "Generate a question set for the %s exam. Total questions: %d. " +
-                            "This includes 5 MCQs (1 mark each) and 2 MSQs (2 marks each) with multiple answers. The 2 MSQs must be after the 5 MCQs. " +
+                            "This includes 5 MCQs (1 mark each) and 2 MSQs (2 marks each) with multiple answers. The 2 MSQs must be after the 5 MCQs. For code snippet try to follow proper indentation" +
                             "Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), " +
                             "'Answers' (comma-separated for MSQ), 'Type', and 'Marks'. " +
                             "Additional details: %s",
@@ -112,20 +112,20 @@ public class GenerationService {
                     "Generate a question set for the %s exam. Total questions: %d. " +
                             "The set should contain 50 questions on English (Reading Comprehension, Vocabulary, Grammar), " +
                             "50 on a specific subject (based on NCERT Class 12 syllabus), and 50 on General Awareness (GK, Current Affairs, Reasoning). " +
-                            "All questions are single-answer MCQs, each worth 5 marks. " +
+                            "All questions are single-answer MCQs, each worth 5 marks. For code snippet try to follow proper indentation" +
                             "Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks' " +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "CUET(PG)" -> String.format(
                     "Generate a question set of format CUET(PG). Total no of questions: %d. " +
-                            "Each question is of MCQ type and carries 4 marks. Your task is to return question, 4 options(separated by comma), answer, type and marks. Other Details: %s",
+                            "Each question is of MCQ type and carries 4 marks.For code snippet try to follow proper indentation. Your task is to return question, 4 options(separated by comma), answer, type and marks. Other Details: %s",
                     request.getTotalQuestion(), request.getDescription());
 
             case "Other" ->
                 String.format(
                         "Generate a question set of Total no of questions: %d. " +
-                                "Total MCQ of mark 1 is %d, total MCQ of mark 2 is %d, total MSQ of mark 1 is %d, total MSQ of mark 2 is %d,total NAT of mark 1 is %d and total NAT of mark 2 is %d .Your task is to return question, 4 options(separated by comma), answer, type and marks. For type NAT don't need to give options. Other Details: %s",
+                                "Total MCQ of mark 1 is %d, total MCQ of mark 80 is %d, total MSQ of mark 20 is %d, total MSQ of mark 2 is %d,total NAT of mark 1 is %d and total NAT of mark 2 is %d . For code snippet try to follow proper indentation. Your task is to return question, 4 options(separated by comma), answer, type and marks. For type NAT don't need to give options. Other Details: %s",
                         request.getTotalQuestion(),request.getMcq1(),request.getMcq2(),request.getMsq1(),request.getMsq2(),request.getNat1(),request.getNat2(),request.getDescription());
             default -> {
                 yield null;
