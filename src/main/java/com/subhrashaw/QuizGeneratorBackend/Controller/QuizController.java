@@ -123,7 +123,7 @@ public class QuizController {
         QuizRequest details= request.getQuizDetails();
         List<ManualQuizQuestion> questions=request.getQuestionDetails();
         System.out.println(details);
-        System.out.println(questions);
+        System.out.println(questions.get(0).toString());
         if(details==null || questions==null)
         {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

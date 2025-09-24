@@ -8,10 +8,10 @@ public class QuizResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn
     private QuizClass quizClass;
-    @OneToOne
+    @ManyToOne
     @JoinColumn
     private QuizUsers quizUser;
     private boolean isPerformed;
@@ -63,7 +63,7 @@ public class QuizResult {
         return isPerformed;
     }
 
-    public void setIsPerformed(boolean performed) {
+    public void setPerformed(boolean performed) {
         isPerformed = performed;
     }
 

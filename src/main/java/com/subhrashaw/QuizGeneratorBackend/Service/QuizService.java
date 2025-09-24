@@ -156,7 +156,7 @@ public class QuizService {
         QuizUsers user=userRepo.findByEmail(email);
         quizClassRepo.save(quizClass);
         result.setObtainedMark(marks);
-        result.setIsPerformed(true);
+        result.setPerformed(true);
         result.setQuizUser(user);
         resultRepo.save(result);
         return true;
@@ -176,7 +176,7 @@ public class QuizService {
         for(ManualQuizQuestion q:questions)
         {
             String [] options=q.getOptions();
-            QuizMarks mark=quizMarksRepo.findByTypeAndMark(q.getType(),q.getMark());
+            QuizMarks mark=quizMarksRepo.findByTypeAndMarkAndNegMark(q.getType(),q.getMark(),0.25);
             questionSet.add(new QuizQuestion(q.getQuestion(),options[0],options[1],options[2],options[3],q.getAnswer(),mark));
         }
         List<QuizQuestion> questions1=quizQuestionsRepo.saveAll(questionSet);
@@ -203,7 +203,7 @@ public class QuizService {
         result.setObtainedMark(0.0);
         result.setQuizUser(user);
         result.setDate(date);
-        result.setIsPerformed(true);
+        result.setPerformed(true);
         result.setRole("Admin");
         result.setQuizClass(response);
         QuizResult status=resultRepo.save(result);

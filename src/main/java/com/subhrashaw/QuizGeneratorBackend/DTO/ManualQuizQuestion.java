@@ -1,5 +1,7 @@
 package com.subhrashaw.QuizGeneratorBackend.DTO;
 
+import java.util.Arrays;
+
 public class ManualQuizQuestion {
     private String question;
     private String options[];
@@ -45,5 +47,16 @@ public class ManualQuizQuestion {
 
     public void setMark(int mark) {
         this.mark = mark;
+    }
+
+    @Override
+    public String toString() {
+        return "ManualQuizQuestion{" +
+                "question='" + question + '\'' +
+                ", options=" + Arrays.toString(options) +
+                ", answer='" + answer + '\'' +
+                ", type='" + type + '\'' +
+                ", mark=" + mark +
+                '}';
     }
 }
