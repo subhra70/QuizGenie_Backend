@@ -8,12 +8,16 @@ public class QuizResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String email;
     @OneToOne
     @JoinColumn
     private QuizClass quizClass;
+    @OneToOne
+    @JoinColumn
+    private QuizUsers quizUser;
+    private boolean isPerformed;
     private double obtainedMark;
     private String date;
+    private String role;
 
     public int getId() {
         return id;
@@ -47,11 +51,27 @@ public class QuizResult {
         this.date = date;
     }
 
-    public String getEmail() {
-        return email;
+    public QuizUsers getQuizUser() {
+        return quizUser;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setQuizUser(QuizUsers quizUser) {
+        this.quizUser = quizUser;
+    }
+
+    public boolean isPerformed() {
+        return isPerformed;
+    }
+
+    public void setIsPerformed(boolean performed) {
+        isPerformed = performed;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

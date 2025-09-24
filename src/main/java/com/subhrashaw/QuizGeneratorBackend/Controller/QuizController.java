@@ -1,7 +1,6 @@
 package com.subhrashaw.QuizGeneratorBackend.Controller;
 
-import com.subhrashaw.QuizGeneratorBackend.DTO.QuizRequest;
-import com.subhrashaw.QuizGeneratorBackend.DTO.QuizResponse;
+import com.subhrashaw.QuizGeneratorBackend.DTO.*;
 import com.subhrashaw.QuizGeneratorBackend.Model.QuizClass;
 import com.subhrashaw.QuizGeneratorBackend.Model.QuizQuestion;
 import com.subhrashaw.QuizGeneratorBackend.Model.QuizResult;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class QuizController {
@@ -37,11 +37,17 @@ public class QuizController {
         if (!jwtService.validateToken(token, email)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        List<QuizQuestion> list = generationService.generate(request);
+        GenerateResponse res=generationService.generate(request);
+        if(res==null)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<QuizQuestion> list = res.getQuestions();
+        int fullMarks=res.getFullMarks();
         if (list == null || list.size() == 0) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        quizService.saveQuestions(email, list, request.getDuration(), request.getFullMarks());
+        quizService.saveQuestions(email, list, request.getDuration(), fullMarks);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -63,7 +69,7 @@ public class QuizController {
     }
 
     @PostMapping("/answeredQuiz/{uid}")
-    public ResponseEntity<HttpStatus> submitQuiz(@RequestHeader("Authorization") String auth, @RequestBody QuizResponse response, @PathVariable("uid") int uid) {
+    public ResponseEntity<HttpStatus> submitQuiz(@RequestHeader("Authorization") String auth, @RequestBody List<QuizResponse> response, @PathVariable("uid") int uid) {
         if (auth == null || !auth.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -100,5 +106,33 @@ public class QuizController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(resultSet,HttpStatus.OK);
+    }
+
+    @PostMapping("/manualCreation")
+    public ResponseEntity<HttpStatus> saveData(@RequestHeader("Authorization") String auth, @RequestBody ManualQuizRequest request)
+    {
+        if(auth==null || !auth.startsWith("Bearer "))
+        {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String token=auth.substring(7);
+        String email= jwtService.extractUserName(token);
+        if (!jwtService.validateToken(token, email)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        QuizRequest details= request.getQuizDetails();
+        List<ManualQuizQuestion> questions=request.getQuestionDetails();
+        System.out.println(details);
+        System.out.println(questions);
+        if(details==null || questions==null)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        boolean status=quizService.saveQuiz(details,questions,email);
+        if(!status)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

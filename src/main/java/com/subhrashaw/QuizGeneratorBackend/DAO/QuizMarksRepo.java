@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface QuizMarksRepo extends JpaRepository<QuizMarks,Integer> {
 
     QuizMarks findByTypeAndMarkAndNegMark(String type, int mark, double negMark);
+
+    QuizMarks findByTypeAndMark(String type, int mark);
 }

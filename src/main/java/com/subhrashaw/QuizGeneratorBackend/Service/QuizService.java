@@ -1,20 +1,16 @@
 package com.subhrashaw.QuizGeneratorBackend.Service;
 
-import com.subhrashaw.QuizGeneratorBackend.DAO.QuizClassRepo;
-import com.subhrashaw.QuizGeneratorBackend.DAO.QuizMarksRepo;
-import com.subhrashaw.QuizGeneratorBackend.DAO.QuizQuestionsRepo;
-import com.subhrashaw.QuizGeneratorBackend.DAO.QuizResultRepo;
+import com.subhrashaw.QuizGeneratorBackend.DAO.*;
+import com.subhrashaw.QuizGeneratorBackend.DTO.ManualQuizQuestion;
+import com.subhrashaw.QuizGeneratorBackend.DTO.QuizRequest;
 import com.subhrashaw.QuizGeneratorBackend.DTO.QuizResponse;
-import com.subhrashaw.QuizGeneratorBackend.Model.QuizClass;
-import com.subhrashaw.QuizGeneratorBackend.Model.QuizMarks;
-import com.subhrashaw.QuizGeneratorBackend.Model.QuizQuestion;
-import com.subhrashaw.QuizGeneratorBackend.Model.QuizResult;
+import com.subhrashaw.QuizGeneratorBackend.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -27,6 +23,8 @@ public class QuizService {
     private QuizClassRepo quizClassRepo;
     @Autowired
     private QuizResultRepo resultRepo;
+    @Autowired
+    private UserRepo userRepo;
     public void setMarks()
     {
         QuizMarks quizMarks1=new QuizMarks("MCQ",1,0.33);
@@ -54,11 +52,11 @@ public class QuizService {
     }
     public QuizMarks getQuizMarks(String type,int mark,String format)
     {
-        if(format.equals("JECA"))
+        if(format.equals("JECA") && type.equals("MCQ"))
         {
             return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
         }
-        return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.33);
+        return quizMarksRepo.findByTypeAndMark(type,mark);
     }
     public void saveQuestions(String email,List<QuizQuestion> list,int duration,int fullMarks)
     {
@@ -66,95 +64,153 @@ public class QuizService {
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String date= currentDate.format(formatter);
         QuizClass quiz=new QuizClass();
-        quiz.setEmail(email);
         quiz.setQuizQuestion(list);
         quiz.setDuration(duration);
         quiz.setFullMarks(fullMarks);
-        quiz.setPerformed(false);
         quiz.setLocked(false);
         quiz.setPassword(null);
         quizClassRepo.save(quiz);
+        QuizUsers user=userRepo.findByEmail(email);
+        if(user==null)
+        {
+            return;
+        }
         QuizResult result=new QuizResult();
         result.setQuizClass(quiz);
         result.setObtainedMark(0);
-        result.setEmail(email);
         result.setDate(date);
+        result.setQuizUser(user);
+        result.setRole("User");
         resultRepo.save(result);
     }
 
     public QuizClass getQuestionSet(int id, String email) {
-        return quizClassRepo.findByIdAndEmail(id,email);
+        return quizClassRepo.findById(id);
     }
 
-    public boolean calResult(QuizResponse response, int uid,String email) {
-        QuizClass quizClass=quizClassRepo.findById(uid).orElse(new QuizClass((-1)));
-        LocalDate currentDate=LocalDate.now();
-        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String date= currentDate.format(formatter);
-        if(quizClass.getId()==-1)
+    public boolean calResult(List<QuizResponse> response, int uid,String email) {
+        QuizClass quizClass=quizClassRepo.findById(uid);
+        if(quizClass==null)
         {
             return false;
         }
-        List<QuizQuestion> questionSet=quizClass.getQuizQuestion();
+        List<QuizQuestion> questions=quizClass.getQuizQuestion();
+        HashMap<Integer,String[]> map=new HashMap<>();
         double marks=0.0;
-        for (QuizQuestion question:questionSet)
+        int full_marks=0;
+        for(QuizResponse resp:response)
         {
-            if(question.getMarks().getType().equals("MCQ")&& response.getQid()==question.getId())
-            {
-                if(!response.getAnswer().trim().equals("")&&response.getAnswer().trim().equals(question.getAnswer().trim()))
-                {
-                    marks+=question.getMarks().getMark();
-                }
-                else{
-                    marks-=question.getMarks().getNegMark();
-                }
-            }
-            else if(!response.getAnswer().trim().equals("")&&question.getMarks().getType().equals("MSQ") && response.getQid()== question.getId())
-            {
-                String answers[]=response.getAnswer().split(",");
-                String savedAnswer[]=question.getAnswer().split(",");
-                int match=0;
-                if(answers.length== savedAnswer.length)
-                {
-                    for(int i=0;i< answers.length;i++)
-                    {
-                        String curr=answers[i];
-                        for(int j=0;j< savedAnswer.length;j++)
-                        {
-                            if(savedAnswer[j].trim().equals(curr.trim()))
-                            {
-                                match++;
-                            }
+            map.put(resp.getId(), resp.getAnswer());
+        }
+        for (QuizQuestion q : questions) {
+            full_marks+=q.getMarks().getMark();
+            if (map.containsKey(q.getId())) {
+                String[] answer = map.get(q.getId());
+
+                if ("MCQ".equals(q.getMarks().getType())) {
+                    System.out.println(1);
+                    if (answer != null && answer.length > 0) {
+                        if (q.getAnswer().trim().equals(answer[0].trim())) {
+                            marks += q.getMarks().getMark();
+                        } else {
+                            marks -= q.getMarks().getNegMark();
                         }
                     }
-                    double val=(question.getMarks().getMark()*(match/savedAnswer.length)*100.0)/100.0;
-                    marks+=val;
                 }
+                else if ("MSQ".equals(q.getMarks().getType())) {
+                    String[] savedAns = q.getAnswer().split(",");
+                    Set<String> set = new HashSet<>();
+                    if (answer != null) {
+                        for (String ans : answer) set.add(ans.trim());
+                    }
 
-            }
-            else if(!response.getAnswer().trim().equals("")&&question.getMarks().getType().equals("NAT"))
-            {
-                double respAns=(Double.parseDouble(response.getAnswer())*100.0)/100.0;
-                double answered=(Double.parseDouble(question.getAnswer())*100.0)/100.0;
-                if(respAns==answered)
-                {
-                    marks+=question.getMarks().getMark();
+                    int correct = 0;
+                    boolean wrong = false;
+                    for (String ans : savedAns) {
+                        if (set.contains(ans.trim())) correct++;
+                        else wrong = true;
+                    }
+
+                    // If no wrongs, partial marking
+                    if (!wrong) {
+                        marks += ((double) correct / savedAns.length) * q.getMarks().getMark();
+                    }
+                }
+                else { // Numeric/NAT
+                    if (answer != null && answer.length > 0) {
+                        double savedAns = Double.parseDouble(q.getAnswer().trim());
+                        double respAns = Double.parseDouble(answer[0].trim());
+                        if (Math.abs(savedAns - respAns) < 1e-6) {
+                            marks += q.getMarks().getMark();
+                        }
+                    }
                 }
             }
         }
+        quizClass.setFullMarks(full_marks);
         QuizResult result=resultRepo.findByQuizClass(quizClass);
         if(result==null)
         {
             return false;
         }
-        quizClass.setPerformed(true);
+        QuizUsers user=userRepo.findByEmail(email);
+        quizClassRepo.save(quizClass);
         result.setObtainedMark(marks);
-        result.setQuizClass(quizClass);
+        result.setIsPerformed(true);
+        result.setQuizUser(user);
         resultRepo.save(result);
         return true;
     }
 
     public List<QuizResult> getResult(String email) {
-        return resultRepo.findAllByEmail(email);
+        QuizUsers user=userRepo.findByEmail(email);
+        return resultRepo.findAllByQuizUser(user);
+    }
+
+    public boolean saveQuiz(QuizRequest details, List<ManualQuizQuestion> questions, String email) {
+        LocalDate currentDate=LocalDate.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String date= currentDate.format(formatter);
+        QuizClass quizClass=new QuizClass();
+        List<QuizQuestion> questionSet=new ArrayList<>();
+        for(ManualQuizQuestion q:questions)
+        {
+            String [] options=q.getOptions();
+            QuizMarks mark=quizMarksRepo.findByTypeAndMark(q.getType(),q.getMark());
+            questionSet.add(new QuizQuestion(q.getQuestion(),options[0],options[1],options[2],options[3],q.getAnswer(),mark));
+        }
+        List<QuizQuestion> questions1=quizQuestionsRepo.saveAll(questionSet);
+        if(questions1==null || questions1.size()==0)
+        {
+            return false;
+        }
+        quizClass.setFullMarks(details.getFullMarks());
+        quizClass.setLocked(false);
+        quizClass.setPassword(null);
+        quizClass.setDuration(details.getDuration());
+        quizClass.setQuizQuestion(questions1);
+        QuizClass response=quizClassRepo.save(quizClass);
+        if(response==null)
+        {
+            return false;
+        }
+        QuizResult result=new QuizResult();
+        QuizUsers user=userRepo.findByEmail(email);
+        if(user==null)
+        {
+            return false;
+        }
+        result.setObtainedMark(0.0);
+        result.setQuizUser(user);
+        result.setDate(date);
+        result.setIsPerformed(true);
+        result.setRole("Admin");
+        result.setQuizClass(response);
+        QuizResult status=resultRepo.save(result);
+        if(status==null)
+        {
+            return false;
+        }
+        return true;
     }
 }

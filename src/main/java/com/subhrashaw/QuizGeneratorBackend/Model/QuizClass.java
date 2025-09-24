@@ -9,13 +9,11 @@ public class QuizClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String email;
     @OneToMany
     @JoinColumn
     private List<QuizQuestion> quizQuestion;
     private int duration;
     private String password;
-    private boolean isPerformed;
     private boolean isLocked;
     private int fullMarks;
 
@@ -50,14 +48,6 @@ public class QuizClass {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String gmail) {
-        this.email = gmail;
-    }
-
     public int getDuration() {
         return duration;
     }
@@ -74,14 +64,6 @@ public class QuizClass {
         this.fullMarks = fullMarks;
     }
 
-    public boolean isPerformed() {
-        return isPerformed;
-    }
-
-    public void setPerformed(boolean performed) {
-        isPerformed = performed;
-    }
-
     public boolean isLocked() {
         return isLocked;
     }
@@ -94,11 +76,9 @@ public class QuizClass {
     public String toString() {
         return "QuizClass{" +
                 "id=" + id +
-                ", email='" + email + '\'' +
                 ", quizQuestion=" + quizQuestion +
                 ", duration=" + duration +
                 ", password='" + password + '\'' +
-                ", isPerformed=" + isPerformed +
                 ", isLocked=" + isLocked +
                 ", fullMarks=" + fullMarks +
                 '}';

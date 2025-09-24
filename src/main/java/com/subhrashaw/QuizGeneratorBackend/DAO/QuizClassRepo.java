@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface QuizClassRepo extends JpaRepository<QuizClass,Integer> {
-    QuizClass findByIdAndEmail(int id, String email);
-
+    QuizClass findById(int uid);
 }
