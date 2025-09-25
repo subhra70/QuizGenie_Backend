@@ -58,7 +58,7 @@ public class QuizService {
         }
         return quizMarksRepo.findByTypeAndMark(type,mark);
     }
-    public void saveQuestions(String email,List<QuizQuestion> list,int duration,int fullMarks)
+    public void saveQuestions(String email,List<QuizQuestion> list,int duration,int fullMarks,boolean isNegative)
     {
         LocalDate currentDate=LocalDate.now();
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -67,6 +67,7 @@ public class QuizService {
         quiz.setQuizQuestion(list);
         quiz.setDuration(duration);
         quiz.setFullMarks(fullMarks);
+        quiz.setNegAllow(isNegative);
         quiz.setLocked(false);
         quiz.setPassword(null);
         quizClassRepo.save(quiz);
@@ -90,6 +91,7 @@ public class QuizService {
 
     public boolean calResult(List<QuizResponse> response, int uid,String email) {
         QuizClass quizClass=quizClassRepo.findById(uid);
+        boolean neg=quizClass.isNegAllow();
         if(quizClass==null)
         {
             return false;
@@ -113,7 +115,9 @@ public class QuizService {
                         if (q.getAnswer().trim().equals(answer[0].trim())) {
                             marks += q.getMarks().getMark();
                         } else {
-                            marks -= q.getMarks().getNegMark();
+                            if(neg) {
+                                marks -= q.getMarks().getNegMark();
+                            }
                         }
                     }
                 }

@@ -47,7 +47,7 @@ public class QuizController {
         if (list == null || list.size() == 0) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        quizService.saveQuestions(email, list, request.getDuration(), fullMarks);
+        quizService.saveQuestions(email, list, request.getDuration(), fullMarks,request.isNegativeMark());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

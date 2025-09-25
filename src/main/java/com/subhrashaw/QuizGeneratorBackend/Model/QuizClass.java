@@ -12,6 +12,7 @@ public class QuizClass {
     @OneToMany
     @JoinColumn
     private List<QuizQuestion> quizQuestion;
+    private boolean negAllow;
     private int duration;
     private String password;
     private boolean isLocked;
@@ -70,6 +71,14 @@ public class QuizClass {
 
     public void setLocked(boolean locked) {
         isLocked = locked;
+    }
+
+    public boolean isNegAllow() {
+        return negAllow;
+    }
+
+    public void setNegAllow(boolean negAllow) {
+        this.negAllow = negAllow;
     }
 
     @Override
