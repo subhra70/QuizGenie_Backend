@@ -78,6 +78,7 @@ public class GenerationService {
             });
             generateResponse.setQuestions(questions);
             generateResponse.setFullMarks(fm[0]);
+            System.out.println(questions);
             return generateResponse;
 
 
