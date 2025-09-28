@@ -56,6 +56,10 @@ public class QuizService {
         {
             return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
         }
+        else if(format.equals("Other") && type.equals("MCQ"))
+        {
+            return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
+        }
         return quizMarksRepo.findByTypeAndMark(type,mark);
     }
     public void saveQuestions(String email,List<QuizQuestion> list,int duration,int fullMarks,boolean isNegative)
@@ -110,7 +114,6 @@ public class QuizService {
                 String[] answer = map.get(q.getId());
 
                 if ("MCQ".equals(q.getMarks().getType())) {
-                    System.out.println(1);
                     if (answer != null && answer.length > 0) {
                         if (q.getAnswer().trim().equals(answer[0].trim())) {
                             marks += q.getMarks().getMark();

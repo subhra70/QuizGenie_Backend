@@ -55,6 +55,7 @@ public class GenerationService {
             Client client = Client.builder().apiKey(apiKey).build();
             GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", query, null);
             String text=response.text();
+            System.out.println("Text:"+text);
             if(text.startsWith("```"))
             {
                 int firsNwline=text.indexOf('\n');
@@ -78,6 +79,7 @@ public class GenerationService {
             });
             generateResponse.setQuestions(questions);
             generateResponse.setFullMarks(fm[0]);
+            System.out.println(questions);
             return generateResponse;
 
 
@@ -128,13 +130,14 @@ public class GenerationService {
 
             case "CUET(PG)" -> String.format(
                     "Generate a question set of format CUET(PG). Total no of questions: %d. " +
-                            "Each question is of MCQ type and carries 4 marks. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation. At least one question must have from each topic or subject.Your task is to return question, 4 options(separated by comma), answer, type and marks. Other Details: %s",
+                            "Each question is of MCQ type and carries 4 marks. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation. At least one question must have from each topic or subject. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks'. Other Details: %s",
                     request.getTotalQuestion(), request.getDescription());
 
             case "Other" ->
                 String.format(
                         "Generate a question set of exactly of %d questions. " +
-                                "Total MCQ of mark 1 is %d, total MCQ of mark 2 is %d, total MSQ of mark 1 is %d, total MSQ of mark 2 is %d,total NAT of mark 1 is %d and total NAT of mark 2 is %d. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation. Your task is to return question, 4 options(separated by comma), answer, type and marks. For type NAT don't need to give options. Other Details: %s",
+                                "Total MCQ of mark 1 is %d, total MCQ of mark 2 is %d, total MSQ of mark 1 is %d, total MSQ of mark 2 is %d,total NAT of mark 1 is %d and total NAT of mark 2 is %d. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough." +
+                                "For code snippet try to follow proper indentation. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks'. For type NAT don't need to give options.Other Details: %s",
                         request.getTotalQuestion(),request.getMcq1(),request.getMcq2(),request.getMsq1(),request.getMsq2(),request.getNat1(),request.getNat2(),request.getDescription());
             default -> {
                 yield null;
