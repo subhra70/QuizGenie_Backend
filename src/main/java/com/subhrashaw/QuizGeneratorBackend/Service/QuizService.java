@@ -60,6 +60,10 @@ public class QuizService {
         {
             return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
         }
+        else if(type.equals("MCQ") && format.equals("GATE"))
+        {
+            return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.33);
+        }
         return quizMarksRepo.findByTypeAndMark(type,mark);
     }
     public void saveQuestions(String email,List<QuizQuestion> list,int duration,int fullMarks,boolean isNegative)
