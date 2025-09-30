@@ -60,7 +60,7 @@ public class QuizService {
         {
             return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
         }
-        else if(type.equals("MCQ") && format.equals("GATE"))
+        else if(type.equals("MCQ") && format.equals("GATE") && mark==1)
         {
             return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.33);
         }

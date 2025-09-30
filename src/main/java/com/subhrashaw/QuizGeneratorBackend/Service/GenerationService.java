@@ -55,7 +55,6 @@ public class GenerationService {
             Client client = Client.builder().apiKey(apiKey).build();
             GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", query, null);
             String text=response.text();
-            System.out.println("Text:"+text);
             if(text.startsWith("```"))
             {
                 int firsNwline=text.indexOf('\n');
@@ -92,10 +91,10 @@ public class GenerationService {
     private String getQuery(QuizRequest request) {
         return switch (request.getFormat()) {
             case "GATE" -> String.format(
-                    "Generate questions for %s examination consists of exactly %d questions of total 100 marks. First 10 questions (5 MCQ 1 marks, 3 MCQ 2 marks and 2 MSQ 2 marks) of General Knowledge (Medium to Hard Level) must come consequtively." +
-                            "The remaining 55 questions (85 marks) are from the subject paper and comprise of 19 MCQ 1 mark, 12 MCQ 2 marks, 10 MSQ 1 mark, 9 MSQ 2 marks, 4 NAT type of 1 mark and 5 NAT type of 2 marks." +
-                            "NAT questions require a numerical response within the specified answer range." +
-                            "Try to generate at least of 1 question from each subjects or topics. " +
+                    "Generate questions for %s examination consists of exactly %d questions of total 100 marks. First 10 questions (5 MCQ 1 marks, 3 MCQ 2 marks and 2 MSQ 2 marks) must be from General Knowledge (verbal and Quantitative aptitude) must come consequtively." +
+                            "The remaining 55 questions (85 marks) are from the subject paper and comprise of MCQ of 1 mark, MCQ of 2 marks, MSQ of 1 mark, MSQ of 2 marks, NAT type of 1 mark and NAT type of 2 marks." +
+                            "Question must be medium to hard level and contains more than half of numerical question for corresponding subjects .NAT questions require a numerical response within the specified answer range." +
+                            "Try to generate at least of 1 question from each subjects or topics." +
                             "User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively(except GA), it must be shuffled enough also same type question should not come consequtively. "+
                             "Return the data in a JSON-friendly key-value format. Keys must be 'Question', 'Options' (comma-separated), " +
                             "'Answers' (comma-separated for MSQ), 'Type', and 'Marks'. " +
@@ -103,19 +102,19 @@ public class GenerationService {
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "NIMCET" -> String.format(
-                    "Generate a question set for the %s exam. Generate exactly %d questions," +
+                    "Generate a question set for the %s exam. Generate exactly %d questions of MCQ type," +
                             "Mathematics (50 questions, 12 marks each), Analytical Ability & Logical Reasoning (40 questions, 6 marks each), " +
                             "Computer Awareness (20 questions, 6 marks each), and General English (10 questions, 4 marks each).User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation" +
-                            "All questions are single-answer MCQs. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), " +
-                            "'Answers', 'Type' (MCQ), and 'Marks'. " +
+                            "All questions are single-answer MCQs. Return a JSON-friendly key-value format only with 'Question', 'Options' (comma-separated), " +
+                            "'Answers', 'Type', and 'Marks' excluding additional text. " +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "JECA" -> String.format(
                     "Generate a question set for the %s exam. Generate exactly %d " +
                             "questions. Question set must includes exactly 80 MCQs (1 mark each) and exactly 20 MSQs (2 marks each) with multiple answers. The 20 MSQs must be after the 80 MCQs. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough. " +
-                            "Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), " +
-                            "'Answers' (comma-separated for MSQ), 'Type', and 'Marks'. " +
+                            "Return a JSON-friendly key-value format only with 'Question', 'Options' (comma-separated), " +
+                            "'Answers' (comma-separated for MSQ), 'Type', and 'Marks' excluding additional text. " +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
@@ -124,20 +123,20 @@ public class GenerationService {
                             "The set should contain 50 questions on English (Reading Comprehension, Vocabulary, Grammar), " +
                             "50 on a specific subject (based on NCERT Class 12 syllabus), and 50 on General Awareness (GK, Current Affairs, Reasoning). " +
                             "All questions are single-answer MCQs, each worth 5 marks. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation" +
-                            "Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks' " +
+                            "Return a JSON-friendly key-value format only with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks' excluding additional text." +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "CUET(PG)" -> String.format(
                     "Generate a question set of format CUET(PG). Total no of questions: %d. " +
-                            "Each question is of MCQ type and carries 4 marks. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation. At least one question must have from each topic or subject. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks'. Other Details: %s",
+                            "Each question is of MCQ type and carries 4 marks. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation. At least one question must have from each topic or subject. Return a JSON-friendly key-value format only with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks' excluding additional text. Other Details: %s",
                     request.getTotalQuestion(), request.getDescription());
 
             case "Other" ->
                 String.format(
                         "Generate a question set of exactly of %d questions. " +
                                 "Total MCQ of mark 1 is %d, total MCQ of mark 2 is %d, total MSQ of mark 1 is %d, total MSQ of mark 2 is %d,total NAT of mark 1 is %d and total NAT of mark 2 is %d. User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough." +
-                                "For code snippet try to follow proper indentation. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks'. For type NAT don't need to give options.Other Details: %s",
+                                "For code snippet try to follow proper indentation. Return a JSON-friendly key-value format with 'Question', 'Options' (comma-separated), 'Answers', 'Type', and 'Marks' excluding additional text. For type NAT don't need to give options.Other Details: %s",
                         request.getTotalQuestion(),request.getMcq1(),request.getMcq2(),request.getMsq1(),request.getMsq2(),request.getNat1(),request.getNat2(),request.getDescription());
             default -> {
                 yield null;
