@@ -1,9 +1,7 @@
 package com.subhrashaw.QuizGeneratorBackend.Service;
 
 import com.subhrashaw.QuizGeneratorBackend.DAO.*;
-import com.subhrashaw.QuizGeneratorBackend.DTO.ManualQuizQuestion;
-import com.subhrashaw.QuizGeneratorBackend.DTO.QuizRequest;
-import com.subhrashaw.QuizGeneratorBackend.DTO.QuizResponse;
+import com.subhrashaw.QuizGeneratorBackend.DTO.*;
 import com.subhrashaw.QuizGeneratorBackend.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,10 @@ public class QuizService {
     private QuizResultRepo resultRepo;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private ProblemRepo problemRepo;
+    @Autowired
+    private UserTrackRepo trackRepo;
     public void setMarks()
     {
         QuizMarks quizMarks1=new QuizMarks("MCQ",1,0.33);
@@ -89,7 +91,7 @@ public class QuizService {
         result.setObtainedMark(0);
         result.setDate(date);
         result.setQuizUser(user);
-        result.setRole("User");
+        result.setRole("Admin");
         resultRepo.save(result);
     }
 
@@ -159,12 +161,12 @@ public class QuizService {
             }
         }
         quizClass.setFullMarks(full_marks);
-        QuizResult result=resultRepo.findByQuizClass(quizClass);
+        QuizUsers user=userRepo.findByEmail(email);
+        QuizResult result=resultRepo.findByQuizClassAndQuizUser(quizClass,user);
         if(result==null)
         {
             return false;
         }
-        QuizUsers user=userRepo.findByEmail(email);
         quizClassRepo.save(quizClass);
         result.setObtainedMark(marks);
         result.setPerformed(true);
@@ -222,6 +224,159 @@ public class QuizService {
         {
             return false;
         }
+        return true;
+    }
+
+    public QuizClass getQuizClass(int qid) {
+        return quizClassRepo.findById(qid);
+    }
+
+    public void saveQuizClass(QuizClass quizClass) {
+        quizClassRepo.save(quizClass);
+    }
+
+    public void deleteResult(int id) {
+        resultRepo.deleteById(id);
+    }
+
+    public boolean saveToHistory(QuizUsers user, QuizClass quizClass) {
+        List<QuizResult> list=resultRepo.findAllByQuizUser(user);
+        for(QuizResult temp:list)
+        {
+            if(temp.getQuizClass().getId()== quizClass.getId())
+            {
+                return false;
+            }
+        }
+        QuizResult result=new QuizResult();
+        LocalDate currentDate=LocalDate.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String date= currentDate.format(formatter);
+        result.setPerformed(false);
+        result.setQuizUser(user);
+        result.setQuizClass(quizClass);
+        result.setRole("User");
+        result.setPerformed(false);
+        result.setObtainedMark(0);
+        result.setDate(date);
+        resultRepo.save(result);
+        return true;
+    }
+
+    public boolean updateQuizClass(QuizClass quizClass, EditRequestFormat requestFormat) {
+        quizClass.setFullMarks(requestFormat.getFullMarks());
+        quizClass.setDuration(requestFormat.getDuration());
+        HashMap<Integer, EditQuestionFormat> map=new HashMap<>();
+        for(EditQuestionFormat q:requestFormat.getQuestionSet())
+        {
+            map.put(q.getQuestionsId(),q);
+        }
+        for(QuizQuestion q: quizClass.getQuizQuestion())
+        {
+            if(map.containsKey(q.getId()))
+            {
+                EditQuestionFormat format=map.get(q.getId());
+                q.setQuestion(format.getQuestion());
+                q.setOption1(format.getOptions()[0]);
+                q.setOption2(format.getOptions()[1]);
+                q.setOption3(format.getOptions()[2]);
+                q.setOption4(format.getOptions()[3]);
+                q.setAnswer(format.getAnswer());
+            }
+        }
+        quizClassRepo.save(quizClass);
+        return true;
+    }
+
+    public List<QuizResult> getAllResultByQuiz(QuizClass quizClass) {
+        List<QuizResult> result = resultRepo.findByQuizClassSorted(quizClass);
+        result.removeIf(r -> !r.isPerformed());
+        return result;
+    }
+
+    public void submitQuery(QuizUsers users, ProblemDTO raisedQuery) {
+        Problems problems=new Problems();
+        LocalDate currentDate=LocalDate.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String date= currentDate.format(formatter);
+        problems.setProblem(raisedQuery.getQuery());
+        problems.setRaisedDate(date);
+        problems.setUser(users);
+        problems.setSolveStatus(false);
+        problemRepo.save(problems);
+    }
+
+    public boolean solveQuery(int id) {
+        Problems problems=problemRepo.findById(id).orElse(null);
+        if(problems==null)
+        {
+            return false;
+        }
+        LocalDate currentDate=LocalDate.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String date= currentDate.format(formatter);
+        problems.setSolveDate(date);
+        problems.setSolveStatus(true);
+        problemRepo.save(problems);
+        return true;
+    }
+
+    public List<Problems> getALLProblems() {
+        return problemRepo.findAll();
+    }
+
+    public boolean deleteProblem(int id) {
+        problemRepo.deleteById(id);
+        return true;
+    }
+
+    public boolean handlePurchase(String email,int id) {
+        LocalDate currentDate=LocalDate.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String date= currentDate.format(formatter);
+        QuizUsers users= userRepo.findByEmail(email);
+        System.out.println(1);
+        if(users==null)
+        {
+            return false;
+        }
+        System.out.println(2);
+        TrialTrack userDetails= trackRepo.findByUser(users);
+        System.out.println(userDetails.toString());
+        if(userDetails==null)
+        {
+            return false;
+        }
+        System.out.println("Here");
+        if(id==1)
+        {
+            userDetails.setPremium(true);
+            userDetails.setCreateTrial(userDetails.getCreateTrial()+60);
+            userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+30);
+            userDetails.setAmount(userDetails.getAmount()+169);
+            userDetails.setMonthDuration(userDetails.getMonthDuration()+1);
+            userDetails.setPurchasedDate(date);
+        }
+        else if(id==2)
+        {
+            userDetails.setPremium(true);
+            userDetails.setCreateTrial(userDetails.getCreateTrial()+200);
+            userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+100);
+            userDetails.setAmount(userDetails.getAmount()+499);
+            userDetails.setMonthDuration(userDetails.getMonthDuration()+3);
+            userDetails.setPurchasedDate(date);
+        }
+        else
+        {
+            userDetails.setPremium(true);
+            userDetails.setCreateTrial(userDetails.getCreateTrial()+4999);
+            userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+4999);
+            userDetails.setAmount(userDetails.getAmount()+1199);
+            userDetails.setMonthDuration(userDetails.getMonthDuration()+12);
+            userDetails.setPurchasedDate(date);
+        }
+        System.out.println(userDetails.toString());
+        trackRepo.save(userDetails);
         return true;
     }
 }

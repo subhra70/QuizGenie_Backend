@@ -55,4 +55,14 @@ public class QuizMarks {
     public void setNegMark(double negMark) {
         this.negMark = negMark;
     }
+
+    @Override
+    public String toString() {
+        return "QuizMarks{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", mark=" + mark +
+                ", negMark=" + negMark +
+                '}';
+    }
 }

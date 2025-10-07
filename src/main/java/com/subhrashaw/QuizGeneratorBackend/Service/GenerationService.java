@@ -43,6 +43,7 @@ public class GenerationService {
     }
 
     public GenerateResponse generate(QuizRequest request) {
+        System.out.println(1);
         String query = getQuery(request);
         if (query == null) {
             logger.warn("Unsupported quiz format: {}", request.getFormat());
@@ -67,6 +68,7 @@ public class GenerationService {
             JsonNode rootNode = objectMapper.readTree(text);
             GenerateResponse generateResponse=new GenerateResponse();
             List<QuizQuestion> questions = new ArrayList<>();
+            System.out.println(questions);
             int fm[]=new int[1];
             rootNode.forEach(node -> {
                 QuizQuestion q = createQuizQuestion(node,request.getFormat());
@@ -102,11 +104,11 @@ public class GenerationService {
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "NIMCET" -> String.format(
-                    "Generate a question set for the %s exam. Generate exactly %d questions of MCQ type," +
-                            "Mathematics (50 questions, 12 marks each), Analytical Ability & Logical Reasoning (40 questions, 6 marks each), " +
-                            "Computer Awareness (20 questions, 6 marks each), and General English (10 questions, 4 marks each).User may specifies different subjects then please make sure that all the questions from same subject are not appeared consecutively, it must be shuffled enough.For code snippet try to follow proper indentation" +
-                            "All questions are single-answer MCQs. Return a JSON-friendly key-value format only with 'Question', 'Options' (comma-separated), " +
-                            "'Answers', 'Type', and 'Marks' excluding additional text. " +
+                    "Generate a question set for the %s exam. Generate exactly %d questions of only MCQ type," +
+                            "50 question from Mathematics each of 12 marks, 40 questions from Analytical Ability & Logical Reasoning each of 6 marks, " +
+                            "2 questions from Computer Awareness each of 6 marks, and 10 questions from General English each of 4 marks.For code snippet try to follow proper indentation" +
+                            "All questions are single-answer MCQs. Return a JSON-friendly key-value format. Keys must be 'Question', 'Options' (comma-separated), " +
+                            "'Answers', 'Type', and 'Marks' only. " +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 

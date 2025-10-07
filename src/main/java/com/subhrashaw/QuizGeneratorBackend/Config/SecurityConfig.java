@@ -1,13 +1,20 @@
 package com.subhrashaw.QuizGeneratorBackend.Config;
 
 import com.subhrashaw.QuizGeneratorBackend.DAO.UserRepo;
+import com.subhrashaw.QuizGeneratorBackend.DAO.UserTrackRepo;
 import com.subhrashaw.QuizGeneratorBackend.Model.QuizUsers;
+import com.subhrashaw.QuizGeneratorBackend.Model.TrialTrack;
+import com.subhrashaw.QuizGeneratorBackend.Service.QuizDetailedService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -41,6 +48,12 @@ public class SecurityConfig {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private QuizDetailedService quizDetailedService;
+
+    @Autowired
+    private UserTrackRepo userTrackRepo;
 
     @Autowired
     private ClientRegistrationRepository clientRegistrationRepository;
@@ -88,7 +101,14 @@ public class SecurityConfig {
                 newUser.setEmail(email);
                 newUser.setName(name);
                 newUser.setPicture(picture);
+                TrialTrack userDetails=new TrialTrack();
+                userDetails.setUser(newUser);
+                userDetails.setCreateTrial(1);
+                userDetails.setFreeTrialAutogen(2);
+                userDetails.setPremium(false);
+                userDetails.setStatus(true);
                 userRepo.save(newUser);
+                userTrackRepo.save(userDetails);
                 System.out.println("Google user saved to DB: " + email);
             } else {
                 System.out.println("Google user already exists: " + email);
@@ -133,6 +153,19 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(quizDetailedService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     @Bean
