@@ -280,7 +280,7 @@ public class QuizController {
     }
 
     @PostMapping("addToHistory")
-    public ResponseEntity<HttpStatus> addQuizToHistory(@RequestHeader("Authorization") String auth,@RequestBody Map<String, Integer> body)
+    public ResponseEntity<QuizResult> addQuizToHistory(@RequestHeader("Authorization") String auth,@RequestBody Map<String, Integer> body)
     {
         if(auth==null || !auth.startsWith("Bearer "))
         {
@@ -299,12 +299,12 @@ public class QuizController {
             return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
         }
         QuizClass quizClass=quizService.getQuizClass(id);
-        boolean saveStatus=quizService.saveToHistory(user,quizClass);
-        if(!saveStatus)
+        QuizResult result=quizService.saveToHistory(user,quizClass);
+        if(result==null)
         {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     @PutMapping("/quiz")

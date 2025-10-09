@@ -60,11 +60,22 @@ public class QuizService {
         }
         else if(format.equals("Other") && type.equals("MCQ"))
         {
-            return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.25);
+            if(mark==1) {
+                return quizMarksRepo.findByTypeAndMarkAndNegMark(type, mark, 0.25);
+            }
+            else
+            {
+                return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.5);
+            }
         }
-        else if(type.equals("MCQ") && format.equals("GATE") && mark==1)
+        else if(type.equals("MCQ") && format.equals("GATE"))
         {
-            return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.33);
+            if (mark==1) {
+                return quizMarksRepo.findByTypeAndMarkAndNegMark(type, mark, 0.33);
+            }
+            else{
+                return quizMarksRepo.findByTypeAndMarkAndNegMark(type,mark,0.66);
+            }
         }
         return quizMarksRepo.findByTypeAndMark(type,mark);
     }
@@ -239,13 +250,13 @@ public class QuizService {
         resultRepo.deleteById(id);
     }
 
-    public boolean saveToHistory(QuizUsers user, QuizClass quizClass) {
+    public QuizResult saveToHistory(QuizUsers user, QuizClass quizClass) {
         List<QuizResult> list=resultRepo.findAllByQuizUser(user);
         for(QuizResult temp:list)
         {
             if(temp.getQuizClass().getId()== quizClass.getId())
             {
-                return false;
+                return null;
             }
         }
         QuizResult result=new QuizResult();
@@ -259,8 +270,8 @@ public class QuizService {
         result.setPerformed(false);
         result.setObtainedMark(0);
         result.setDate(date);
-        resultRepo.save(result);
-        return true;
+        QuizResult response=resultRepo.save(result);
+        return response;
     }
 
     public boolean updateQuizClass(QuizClass quizClass, EditRequestFormat requestFormat) {
