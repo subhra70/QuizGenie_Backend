@@ -341,7 +341,7 @@ public class QuizService {
         return true;
     }
 
-    public boolean handlePurchase(String email,int id) {
+    public boolean handlePurchase(String email,int id,int amount) {
         LocalDate currentDate=LocalDate.now();
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String date= currentDate.format(formatter);
@@ -364,7 +364,7 @@ public class QuizService {
             userDetails.setPremium(true);
             userDetails.setCreateTrial(userDetails.getCreateTrial()+60);
             userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+30);
-            userDetails.setAmount(userDetails.getAmount()+169);
+            userDetails.setAmount(userDetails.getAmount()+amount);
             userDetails.setMonthDuration(userDetails.getMonthDuration()+1);
             userDetails.setPurchasedDate(date);
         }
@@ -373,16 +373,16 @@ public class QuizService {
             userDetails.setPremium(true);
             userDetails.setCreateTrial(userDetails.getCreateTrial()+200);
             userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+100);
-            userDetails.setAmount(userDetails.getAmount()+499);
+            userDetails.setAmount(userDetails.getAmount()+amount);
             userDetails.setMonthDuration(userDetails.getMonthDuration()+3);
             userDetails.setPurchasedDate(date);
         }
         else
         {
             userDetails.setPremium(true);
-            userDetails.setCreateTrial(userDetails.getCreateTrial()+4999);
-            userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+4999);
-            userDetails.setAmount(userDetails.getAmount()+1199);
+            userDetails.setCreateTrial(userDetails.getCreateTrial()+9999);
+            userDetails.setFreeTrialAutogen(userDetails.getFreeTrialAutogen()+9999);
+            userDetails.setAmount(userDetails.getAmount()+amount);
             userDetails.setMonthDuration(userDetails.getMonthDuration()+12);
             userDetails.setPurchasedDate(date);
         }

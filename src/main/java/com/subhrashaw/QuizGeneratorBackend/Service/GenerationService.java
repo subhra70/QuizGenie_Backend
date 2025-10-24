@@ -125,17 +125,16 @@ public class GenerationService {
                     "Generate questions for %s examination consists of exactly %d questions of total 100 marks. " +
                             "First 10 questions (5 MCQ 1 mark, 3 MCQ 2 marks, and 2 MSQ 2 marks) must be from General Aptitude (verbal and quantitative aptitude) and appear consecutively. " +
                             "The remaining 55 questions (85 marks) are from the subject paper and comprise MCQ(Multiple Choice Question), MSQ(Multiple Select Questions), and NAT(Numerical Answer Types) types. " +
-                            "Ensure medium to hard level difficulty with more than half numerical questions. " +
                             "Do not place all questions from the same subject consecutively. " +
                             " Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. " +
-                            "Additional details: %s",
+                            "Additional details: %s\nIf difficulty not mentioned then maintain hard difficulty. When difficulty is hard then for engineering subjects 30/55 must be numerical based (if possible).",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "NIMCET" -> String.format(
                     "Generate a question set for %s with exactly %d MCQ-type questions. " +
-                            "50 from Mathematics (12 marks each), 40 from Analytical & Logical Reasoning (6 marks each), " +
-                            "20 from Computer Awareness (6 marks each), and 10 from English (4 marks each). " +
-                            " Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. " +
+                            "50 questions from Mathematics of 12 marks each, 40 questions from Analytical & Logical Reasoning of 6 marks each, " +
+                            "20 questions from Computer Awareness 6 marks each, and 10 questions from English of 4 marks each. Questions type may follow the pattern and question type like the paper of year 2024." +
+                            " Return JSON friendly response where keys are exactly: 'Question', 'Options'(only comma separated not in array), 'Answers'(only comma separated for MSQ not in array), 'Type', 'Marks'. " +
                             "Additional details: %s",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
@@ -143,19 +142,19 @@ public class GenerationService {
                     "Generate a question set for %s exam with exactly %d questions: 80 MCQs (1 mark each) followed by 20 MSQs (2 marks each). " +
                             "Do not place all questions from the same subject consecutively. " +
                             " Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. " +
-                            "Additional details: %s",
+                            "Additional details: %s\n If difficulty not mentioned maintain hard level difficulty. For hard level at least 30 question must be numerical based. For medium difficulty at least 20 questions must be numerical based.",
                     request.getFormat(), request.getTotalQuestion(), request.getDescription());
 
             case "CUET(UG)" -> String.format(
-                    "Generate %d questions for CUET(UG): 50 English (RC, Vocab, Grammar), " +
+                    "Generate %d questions for CUET(UG): 50 English Questions (RC, Vocabulary, Grammar), " +
                             "50 Questions Subject based (Class 12 syllabus), 50 questions from GK/Current Affairs/Reasoning. " +
                             "All are single-answer MCQs (5 marks each).  Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. " +
                             "Additional details: %s",
                     request.getTotalQuestion(), request.getDescription());
 
             case "CUET(PG)" -> String.format(
-                    "Generate %d MCQ questions for CUET(PG), 4 marks each. Include all major topics from the subject. Difficulty level is medium." +
-                            " Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. ",
+                    "Generate %d questions for CUET(PG), Each of type MCQ 4 marks each. Make sure at least one questions must come from each of the topic mentioned in the syllabus. Maintain the difficulty mentioned in additional details (Difficulty Hard if not mentioned)." +
+                            " Return JSON friendly response where keys are exactly: 'Question', 'Options'(comma separated not in array), 'Answers'(comma separated for MSQ not in array), 'Type', 'Marks'. Additional Details: %s",
                     request.getTotalQuestion(), request.getDescription());
 
             case "Other" -> String.format(

@@ -439,24 +439,24 @@ public class QuizController {
         }
         return new ResponseEntity<>(problemsList,HttpStatus.OK);
     }
-    @PostMapping("/purchase/{id}")
-    public ResponseEntity<HttpStatus> purchasePackage(@RequestHeader("Authorization") String auth,@PathVariable("id") int id)
-    {
-        if(auth==null || !auth.startsWith("Bearer "))
-        {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        String token=auth.substring(7);
-        String email= jwtService.extractUserName(token);
-        if (!jwtService.validateToken(token, email)) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        System.out.println(id);
-        boolean status=quizService.handlePurchase(email,id);
-        if(!status)
-        {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @PostMapping("/purchase/{id}")
+//    public ResponseEntity<HttpStatus> purchasePackage(@RequestHeader("Authorization") String auth,@PathVariable("id") int id)
+//    {
+//        if(auth==null || !auth.startsWith("Bearer "))
+//        {
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//        String token=auth.substring(7);
+//        String email= jwtService.extractUserName(token);
+//        if (!jwtService.validateToken(token, email)) {
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//        System.out.println(id);
+//        boolean status=quizService.handlePurchase(email,id);
+//        if(!status)
+//        {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 }
