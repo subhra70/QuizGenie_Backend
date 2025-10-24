@@ -75,8 +75,6 @@ public class UserController {
         {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        QuizUsers users= userService.getUser(email);
-        TrialTrack userDetails=userService.getUserDetails(users);
         List<TrialTrack> allUsers=userService.getAllUsers();
         if(allUsers==null || allUsers.size()==0)
         {

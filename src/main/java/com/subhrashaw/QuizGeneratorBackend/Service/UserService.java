@@ -25,19 +25,20 @@ public class UserService {
 
     public TrialTrack getUserDetails(QuizUsers users) {
         TrialTrack res= userTrackRepo.findByUser(users);
-        String storedDate=res.getPurchasedDate();
-        LocalDate currDate=LocalDate.now();
-        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate date=LocalDate.parse(storedDate,formatter);
-        LocalDate validDate=date.plusDays(res.getMonthDuration()*30);
-        if(currDate.isAfter(validDate))
-        {
-            res.setAmount(0);
-            res.setMonthDuration(0);
-            res.setPremium(false);
-            res.setFreeTrialAutogen(0);
-            res.setCreateTrial(0);
-            userTrackRepo.save(res);
+        if(res.isPremium()) {
+            String storedDate = res.getPurchasedDate();
+            LocalDate currDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate date = LocalDate.parse(storedDate, formatter);
+            LocalDate validDate = date.plusDays(res.getMonthDuration() * 30);
+            if (currDate.isAfter(validDate)) {
+                res.setAmount(0);
+                res.setMonthDuration(0);
+                res.setPremium(false);
+                res.setFreeTrialAutogen(0);
+                res.setCreateTrial(0);
+                userTrackRepo.save(res);
+            }
         }
         return res;
     }
