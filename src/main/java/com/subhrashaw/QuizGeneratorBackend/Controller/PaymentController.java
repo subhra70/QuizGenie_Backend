@@ -73,8 +73,10 @@ public class PaymentController {
             if (generatedSignature.equals(signature)) {
                 RazorpayClient razorpayClient=new RazorpayClient(razorpayApiKey,razorpaySecret);
                 Order order=razorpayClient.orders.fetch(orderId);
-                int planId=Integer.parseInt(order.get("receipt").toString().substring(8,10));
-                int amount=Integer.parseInt(order.get("receipt").toString().substring(10));
+                String receipt=order.get("receipt").toString();
+                String receiptData = receipt.substring(8); // after "receipt_"
+                int planId = Integer.parseInt(receiptData.substring(0, 1)); // first digit
+                int amount = Integer.parseInt(receiptData.substring(1));
                 quizService.handlePurchase(email,planId,amount);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
