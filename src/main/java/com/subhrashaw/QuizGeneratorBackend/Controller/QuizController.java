@@ -50,6 +50,7 @@ public class QuizController {
         if (!jwtService.validateToken(token, email)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        quizService.setMarks();
         GenerateResponse res=generationService.generate(request);
         if(res==null)
         {
